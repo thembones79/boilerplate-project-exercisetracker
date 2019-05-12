@@ -19,6 +19,28 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/views/index.html");
 });
 
+////////////////////////////////////////////////////////////////////////////////////////////
+/// database initialisation
+
+var Schema = mongoose.Schema;
+
+var linkDatabaseSchema = new Schema({
+  orginal_url: {
+    type: String,
+    required: true
+  },
+  short_url: Number,
+  secret: String
+});
+
+var LinkDatabase = mongoose.model("LinkDatabase", linkDatabaseSchema);
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+app.post("/api/exercise/new-user",(req,res)=>{
+res.json({username: req.body.username});
+});
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({ status: 404, message: "not found" });
