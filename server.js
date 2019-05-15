@@ -1,16 +1,12 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
-
 const cors = require("cors");
-
 const mongoose = require("mongoose");
 mongoose.connect(process.env.MLAB_URI || "mongodb://localhost/exercise-track", {
   useNewUrlParser: true
 });
-
 app.use(cors());
-
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
@@ -24,23 +20,64 @@ app.get("/", (req, res) => {
 
 var Schema = mongoose.Schema;
 
-var linkDatabaseSchema = new Schema({
-  orginal_url: {
+var userSchema = new Schema({
+  username: {
     type: String,
     required: true
-  },
-  short_url: Number,
-  secret: String
+  }
 });
 
-var LinkDatabase = mongoose.model("LinkDatabase", linkDatabaseSchema);
+var User = mongoose.model("User", userSchema);
+
+function createAndSaveUser(username) {
+    var user = new User({
+      username: username
+    });
+    user.save(function(err, data) {(err ? console.log(err) : console.log(data))});
+  }
+
+const Cat = mongoose.model("Cat", { name: String });
+
+const kitty = new Cat({ name: "Zildjian" });
+kitty.save().then(() => console.log("meow"));
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+
+function findUsersByName(username, cb) {
+  User.find({ username: username }, function(err, data) {
+    if (err) {
+      console.log(err);
+    }
+    cb({id: data[0]._id}) ;
+  });
+};
+
+/////////////////////
+
 app.post("/api/exercise/new-user",(req,res)=>{
+createAndSaveUser(req.body.username);
 res.json({username: req.body.username});
 });
 
+app.get("/api/:username", (req,res)=>{
+//  let user = req.params.username;
+//findUsersByName(user, res.json())
+//res.json({user: user})
+//res.json(findUsersByName(user));
+User.find({ username: req.params.username }, function(err, data) {
+  if (err) {
+    console.log(err);
+  }
+  res.json({ id: data[0]._id });
+});
+
+
+});
+
+findUsersByName("goldberg",console.log);
+
+/*
 // Not found middleware
 app.use((req, res, next) => {
   return next({ status: 404, message: "not found" });
@@ -66,6 +103,8 @@ app.use((err, req, res, next) => {
     .type("txt")
     .send(errMessage);
 });
+
+*/
 
 const listener = app.listen(process.env.PORT || 3000, () => {
   console.log("Your app is listening on port " + listener.address().port);
