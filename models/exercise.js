@@ -11,7 +11,7 @@ var exerciseSchema = mongoose.Schema({
     required: true
   },
   duration: {
-    type: String,
+    type: Number,
     required: true
   },
   date: {
@@ -25,6 +25,11 @@ var Exercise = (module.exports = mongoose.model("Exercise", exerciseSchema));
 // Get Exercises
 module.exports.getExercises = function(callback, limit) {
   Exercise.find(callback).limit(limit);
+};
+
+// Get Exercise
+module.exports.getExerciseById = function(id, callback) {
+  Exercise.findById(id, callback);
 };
 
 //Add Exercise
