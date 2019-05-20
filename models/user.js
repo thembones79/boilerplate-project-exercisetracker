@@ -11,6 +11,12 @@ var userSchema = mongoose.Schema({
 
 var User = (module.exports = mongoose.model("User", userSchema));
 
+
+// Get User
+module.exports.getUserById = function(id, callback) {
+  User.findById(id, callback);
+};
+
 // Get Users
 module.exports.getUsers = function(callback, limit) {
   User.find(callback).limit(limit);

@@ -38,7 +38,7 @@ app.post("/api/exercise/add", function(req, res) {
     exercise.date = Date.now();
   }
 
-  Exercise.getExerciseById(exercise.userId, function(err, data) {
+  User.getUserById(exercise.userId, function(err, user) {
     if (err) {
       res.send("unknown_id");
       console.log(err);
@@ -48,20 +48,84 @@ app.post("/api/exercise/add", function(req, res) {
           res.send(err.message);
           console.log(err);
         }
-        res.json(exercise);
+        res.json({
+          username: user.username,
+          description: exercise.description,
+          duration: exercise.duration,
+          _id: exercise.userId,
+          date: exercise.date
+        });
       });
     }
   });
 });
 
 app.get("/api/exercise/users", function(req, res) {
-  User.getUsers(function(err, user) {
+  User.getUsers(function(err, users) {
     if (err) {
-      throw err;
+      res.send(err.message);
+      console.log(err);
     }
-    res.json(user);
+    res.json(users);
   });
 });
+
+app.get("/api/exercise/log", function(req, res) {
+  
+  var userId = req.query.userId;
+  var limit = req.query.limit;
+  var from = req.query.from;
+  var to = req.query.to;
+  User.getUserById(userId, function(err, user) {
+    if (err) {
+      res.send("unknown_id");
+      console.log(err);
+    } else {
+      Exercise.getExercisesByQueryObject(
+        { userId, date: { $gt: from, $lt: to } },
+        function(err, exercises) {
+          if (err) {
+            res.send(err.message);
+            console.log(err);
+          }
+          res.json({
+            _id: userId,
+            username: user.username,
+            count: exercises.length,
+            log: exercises
+          });
+        },
+        limit,
+        { date: 1 },
+        { userId: 0, _id: 0, __v: 0 }
+      );
+    }
+  });
+});
+
+
+
+
+
+
+// Find people who like "burrito". Sort them alphabetically by name,
+// Limit the results to two documents, and hide their age.
+// Chain `.find()`, `.sort()`, `.limit()`, `.select()`, and then `.exec()`,
+// passing the `done(err, data)` callback to it.
+
+var queryChain = function(done) {
+  var foodToSearch = "burrito";
+
+   Person.find({ favoriteFoods: foodToSearch}).sort({name: 1}).limit(2).select( {age: 0} ).exec(function(err, people) {
+if(err){done(err)}
+     done(null, people)
+})
+};
+
+
+
+
+
 
 app.use(express.static("public"));
 app.get("/", (req, res) => {

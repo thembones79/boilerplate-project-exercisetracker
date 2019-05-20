@@ -27,6 +27,14 @@ module.exports.getExercises = function(callback, limit) {
   Exercise.find(callback).limit(limit);
 };
 
+// Get Exercises for Selected User
+module.exports.getExercisesByQueryObject = function(queryObject, callback, limit, sortingOrder, filterObject) {
+  Exercise.find(queryObject, callback)
+    .limit(limit)
+    .sort(sortingOrder)
+    .select(filterObject);
+};
+
 // Get Exercise
 module.exports.getExerciseById = function(id, callback) {
   Exercise.findById(id, callback);
