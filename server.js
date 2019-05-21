@@ -19,6 +19,7 @@ mongoose.connect(config.MLAB_URI, {
 mongoose.set("useCreateIndex", true);
 var db = mongoose.connection;
 
+// create new user
 app.post("/api/exercise/new-user", function(req, res) {
   var user = req.body;
   User.addUser(user, function(err, user) {
@@ -30,6 +31,7 @@ app.post("/api/exercise/new-user", function(req, res) {
   });
 });
 
+// add new exercise to the user
 app.post("/api/exercise/add", function(req, res) {
   var exercise = req.body;
   if (!exercise.date) {
@@ -58,6 +60,7 @@ app.post("/api/exercise/add", function(req, res) {
   });
 });
 
+// get user list
 app.get("/api/exercise/users", function(req, res) {
   User.getUsers(function(err, users) {
     if (err) {
@@ -68,18 +71,15 @@ app.get("/api/exercise/users", function(req, res) {
   });
 });
 
+// get exercises log for the user
 app.get("/api/exercise/log", function(req, res) {
   var userId = req.query.userId;
-  var from = req.query.from || 0;
-  var to = req.query.to || Date.parse("Aug 9, 2065");
+  var from = req.query.from || 0; // year 1970
+  var to = req.query.to || Date.parse("Aug 9, 2065"); // distant future
 
   User.getUserById(userId, function(err, user) {
 
-    function dateRangeHelper(){
-
-    }
-
-    var obj = {
+     var obj = {
       queryObject: { userId, date: { $gt: from, $lt: to } },
       callback: function(err, exercises) {
         if (err) {
