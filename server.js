@@ -9,10 +9,8 @@ app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-Genre = require("./models/genre");
-Book = require("./models/book");
-User = require("./models/user");
-Exercise = require("./models/exercise");
+var User = require("./models/user");
+var Exercise = require("./models/exercise");
 
 // Connect to mongoose
 mongoose.connect(config.MLAB_URI, {
