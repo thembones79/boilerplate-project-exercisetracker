@@ -71,61 +71,43 @@ app.get("/api/exercise/users", function(req, res) {
 });
 
 app.get("/api/exercise/log", function(req, res) {
-  
   var userId = req.query.userId;
-  var limit = req.query.limit;
-  var from = req.query.from;
-  var to = req.query.to;
+  var from = req.query.from || 0;
+  var to = req.query.to || Date.parse("Aug 9, 2065");
+
   User.getUserById(userId, function(err, user) {
+
+    function dateRangeHelper(){
+
+    }
+
+    var obj = {
+      queryObject: { userId, date: { $gt: from, $lt: to } },
+      callback: function(err, exercises) {
+        if (err) {
+          res.send(err.message);
+          console.log(err);
+        }
+        res.json({
+          _id: userId,
+          username: user.username,
+          count: exercises.length,
+          log: exercises
+        });
+      },
+      limit: req.query.limit,
+      sortingOrder: { date: 1 },
+      filterObject: { userId: 0, _id: 0, __v: 0 }
+    };
+
     if (err) {
       res.send("unknown_id");
       console.log(err);
     } else {
-      Exercise.getExercisesByQueryObject(
-        { userId, date: { $gt: from, $lt: to } },
-        function(err, exercises) {
-          if (err) {
-            res.send(err.message);
-            console.log(err);
-          }
-          res.json({
-            _id: userId,
-            username: user.username,
-            count: exercises.length,
-            log: exercises
-          });
-        },
-        limit,
-        { date: 1 },
-        { userId: 0, _id: 0, __v: 0 }
-      );
+      Exercise.getExercisesByQueryObject(obj);
     }
   });
 });
-
-
-
-
-
-
-// Find people who like "burrito". Sort them alphabetically by name,
-// Limit the results to two documents, and hide their age.
-// Chain `.find()`, `.sort()`, `.limit()`, `.select()`, and then `.exec()`,
-// passing the `done(err, data)` callback to it.
-
-var queryChain = function(done) {
-  var foodToSearch = "burrito";
-
-   Person.find({ favoriteFoods: foodToSearch}).sort({name: 1}).limit(2).select( {age: 0} ).exec(function(err, people) {
-if(err){done(err)}
-     done(null, people)
-})
-};
-
-
-
-
-
 
 app.use(express.static("public"));
 app.get("/", (req, res) => {

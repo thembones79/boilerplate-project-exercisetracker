@@ -28,11 +28,11 @@ module.exports.getExercises = function(callback, limit) {
 };
 
 // Get Exercises for Selected User
-module.exports.getExercisesByQueryObject = function(queryObject, callback, limit, sortingOrder, filterObject) {
-  Exercise.find(queryObject, callback)
-    .limit(limit)
-    .sort(sortingOrder)
-    .select(filterObject);
+module.exports.getExercisesByQueryObject = function(obj) {
+  Exercise.find(obj.queryObject, obj.callback)
+    .limit(obj.limit)
+    .sort(obj.sortingOrder)
+    .select(obj.filterObject);
 };
 
 // Get Exercise
